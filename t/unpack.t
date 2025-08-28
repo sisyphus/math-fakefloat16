@@ -3,6 +3,19 @@ use warnings;
 use Math::FakeFloat16 qw(:all);
 
 use Test::More;
+
+if(Math::FakeFloat16::MPFR_PREC_MIN > 1) {
+#  warn " The unpack_f16_hex() function is disabled because the mpfr library\n",
+#       " against which Math::MPFR was built does not support a precision of 1.\n",
+#       " Please rebuild Math::MPFR against a modern mpfr library (v4.2.0 or later)\n";
+
+  eval { unpack_f16_hex($Math::FakeFloat16::f16_DENORM_MIN);};
+  like($@, qr/^\sPlease rebuild Math::MPFR against/, "unpack_f16_hex disabled");
+
+  done_testing();
+  exit 0;
+}
+
 cmp_ok(unpack_f16_hex($Math::FakeFloat16::f16_DENORM_MIN), 'eq', '0001', "DENORM_MIN unpacks correctly");
 cmp_ok(unpack_f16_hex($Math::FakeFloat16::f16_DENORM_MAX), 'eq', '03FF', "DENORM_MAX unpacks correctly");
 cmp_ok(unpack_f16_hex($Math::FakeFloat16::f16_NORM_MIN),   'eq', '0400', "NORM_MIN unpacks correctly");

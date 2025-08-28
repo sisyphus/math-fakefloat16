@@ -6,6 +6,7 @@ use Math::MPFR qw(:mpfr);
 use constant f16_EMIN     => -23;
 use constant f16_EMAX     =>  16;
 use constant f16_MANTBITS =>  11;
+use constant MPFR_PREC_MIN => Math::MPFR::MPFR_PREC_MIN;
 
 
 use overload
@@ -486,6 +487,13 @@ sub f16_nextbelow {
 }
 
 sub unpack_f16_hex {
+  if(MPFR_PREC_MIN > 1) {
+    warn " The unpack_f16_hex() function is disabled because the mpfr library\n",
+         " against which Math::MPFR was built does not support a precision of 1.\n";
+
+    die  " Please rebuild Math::MPFR against a modern mpfr library (v4.2.0 or later)\n";
+  }
+
   die "Math::FakeFloat16::unpack_f16_hex() accepts only a Math::FakeFloat16 object as its argument"
     unless ref($_[0]) eq "Math::FakeFloat16";
   return _unpack_irregular($_[0]) unless Rmpfr_regular_p(${$_[0]});
