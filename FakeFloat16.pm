@@ -486,9 +486,53 @@ sub f16_nextbelow {
 }
 
 sub unpack_f16_hex {
-  my $nv = Rmpfr_get_NV(${$_[0]}, MPFR_RNDN);
-  my @ret = _unpack_float($nv);
-  return join('', @ret);
+  die "Math::FakeFloat16::unpack_f16_hex() accepts only a Math::FakeFloat16 object as its argument"
+    unless ref($_[0]) eq "Math::FakeFloat16";
+  return _unpack_irregular($_[0]) unless Rmpfr_regular_p(${$_[0]});
+
+  # This sub will have already returned
+  # if $_[0] is Inf, NaN or Zero.
+
+  if(abs($_[0]) < '1.2219e-4') { # The lowest value that consumes 11 bits
+    my $prefix = '0';
+    my $count = int( (23 + Rmpfr_get_exp(${$_[0]})) / 4 ) + 1;
+    my @res = Rmpfr_deref2(${$_[0]}, 16, $count, MPFR_RNDN);
+    $prefix ='8' if $res[0] =~ s/\-//;
+    $res[0] = '0' . $res[0] while length($res[0]) < 3;
+    return $prefix . uc($res[0]);
+  }
+
+  my $signbit = '0';
+  my @res = Rmpfr_deref2(${$_[0]}, 2, 11, MPFR_RNDD);
+  $signbit ='1' if $res[0] =~ s/\-//;
+  my $exp = $res[1] + 14; # 14 == 15 - 1;
+  my $expstr = sprintf "%b", $exp;
+  $expstr = '0' . $expstr while length($expstr) < 5;
+  my $manstr = substr($res[0], -10, 10);
+  my $to_pack = $signbit . $expstr . $manstr;
+  return uc(unpack "H4", pack("B16", $to_pack));
+}
+
+sub _unpack_irregular {
+  my $ret;
+  my $is_type = is_f16_nan($_[0]);
+  return 'FE00' if $is_type;
+
+  $is_type = is_f16_inf($_[0]);
+  if($is_type) {
+    $ret = '7C00';
+    $ret = 'FC00' if $is_type == -1;
+    return $ret
+  }
+
+  $is_type = is_f16_zero($_[0]);
+  if($is_type) {
+    $ret = '0000';
+    $ret = '8000' if $is_type == -1;
+    return $ret
+  }
+
+  die "Unrecognized type passed to _unpack_irregular()";
 }
 
 sub _get_norm_max {
