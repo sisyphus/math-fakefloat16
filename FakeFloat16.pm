@@ -501,7 +501,7 @@ sub unpack_f16_hex {
   # This sub will have already returned
   # if $_[0] is Inf, NaN or Zero.
 
-  if(abs($_[0]) < '1.2219e-4') { # The lowest value that consumes 11 bits
+  if(Rmpfr_get_exp(${$_[0]}) < -12) { # ${$_[0]} < 1.2207e-4
     my $prefix = '0';
     my $count = int( (23 + Rmpfr_get_exp(${$_[0]})) / 4 ) + 1;
     my @res = Rmpfr_deref2(${$_[0]}, 16, $count, MPFR_RNDN);
