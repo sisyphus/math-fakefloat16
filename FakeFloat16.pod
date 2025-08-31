@@ -47,11 +47,11 @@
     $obj = Math::FakeFloat16::new([$val]);
      Set $obj to a Math::FakeFloat16 object with value $val.
      If $val is not provided, the $obj has the value NaN.
-     $val cab be an IV (integer), an NV (perl float), a PV (string),
+     $val can be an IV (integer), an NV (perl float), a PV (string),
      a Math::FakeFloat16 object, a Math::MPFR object, a Math::GMPf
      object or a Math::GMPq object.
      See the SYNOPSIS section (above) for some elaboration,
-     If necessay, $val will be rounded (to nearest, ties to even)
+     If necessary, $val will be rounded (to nearest, ties to even)
      to fit into the  _Float16 type.
 
     f16_set($obj, $val);
@@ -60,7 +60,7 @@
      $val can be any one of the types that new() accepts.
 
     f16_set_nan($obj);
-     Se the value of $obj to NaN.
+     Set the value of $obj to NaN.
 
     f16_set_inf($obj, $iv);
      If $iv is greater than or equal to 0, then set $obj to +Inf.
