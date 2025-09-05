@@ -114,6 +114,11 @@
       print unpack_f16_hex(Math::FakeFloat16->new(2) ** -133); # 0001
       print unpack_f16_hex(Math::FakeFloat16->new(2) ** 128);  # 7F80 (+inf)
 
+   $obj = pack_f16_hex($string);
+    Convert the string ($string) returned by unpack_f16_hex()
+    into a Math::FakeFloat16 object whose value is the same as the
+    object from which $string was derived.
+
 =head1 MISCELLANEOUS FUNCTIONS
 
     $iv = is_f16_nan($obj);
